@@ -78,7 +78,7 @@ export default async function SetupPage() {
     envPresent('GOOGLE_CLIENT_ID') &&
     envPresent('GOOGLE_CLIENT_SECRET') &&
     envPresent('GOOGLE_REFRESH_TOKEN');
-  const images = openrouter;
+  const images = envPresent('MY_BLOG_IMAGES_OPENROUTER_API_KEY') || openrouter;
   const trello =
     envPresent('TRELLO_API_KEY') && envPresent('TRELLO_TOKEN') && envPresent('TRELLO_LIST_ID');
   const telegram =
@@ -148,7 +148,7 @@ export default async function SetupPage() {
               ready: images && AUTOBLOG_PROFILE.integrations.imageGenerationEnabled,
               action: images
                 ? 'Ligue imageGenerationEnabled no perfil e crie o bucket público blog-covers no Supabase.'
-                : 'Defina MY_BLOG_OPENROUTER_API_KEY, crie o bucket blog-covers e ligue imageGenerationEnabled.',
+                : 'Defina MY_BLOG_IMAGES_OPENROUTER_API_KEY, crie o bucket blog-covers e ligue imageGenerationEnabled.',
             },
           ]}
         />
