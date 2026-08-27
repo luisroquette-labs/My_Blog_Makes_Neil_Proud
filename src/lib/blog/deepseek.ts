@@ -16,6 +16,13 @@ export interface ArticleContent {
 
 const { brand, editorial, cta } = AUTOBLOG_PROFILE;
 
+export function blogTextProvider(model: string) {
+  const openRouterKey = process.env.MY_BLOG_OPENROUTER_API_KEY;
+  return openRouterKey
+    ? { apiKey: openRouterKey, baseURL: 'https://openrouter.ai/api/v1', model: `deepseek/${model}` }
+    : { apiKey: process.env.DEEPSEEK_API_KEY, baseURL: 'https://api.deepseek.com/v1', model };
+}
+
 const SYSTEM_PROMPT = `Você redige blogposts para ${brand.name} (${brand.siteUrl}),
 ${editorial.businessDescription}. Público: ${editorial.audience}. Escreva em português brasileiro.
 
@@ -280,9 +287,10 @@ export function isValidOutline(outline: ArticleOutline, keyword: string): boolea
 }
 
 async function askDeepseek(system: string, user: string): Promise<string> {
+  const provider = blogTextProvider('deepseek-v4-flash');
   const client = new OpenAI({
-    apiKey: process.env.DEEPSEEK_API_KEY,
-    baseURL: 'https://api.deepseek.com/v1',
+    apiKey: provider.apiKey,
+    baseURL: provider.baseURL,
     // Sem timeout, uma chamada travada trava o pipeline inteiro até o
     // maxDuration da function (regenerateWithFeedback é chamado em loop
     // pelo quality-gate, até 2x por publicação).
@@ -291,7 +299,7 @@ async function askDeepseek(system: string, user: string): Promise<string> {
   const response = await client.chat.completions.create({
     // 'deepseek-chat' foi desativado pela DeepSeek em 2026-07-24 — deepseek-v4-flash
     // é o substituto de custo equivalente (não-thinking), não deepseek-v4-pro (3x).
-    model: 'deepseek-v4-flash',
+    model: provider.model,
     messages: [
       { role: 'system', content: system },
       { role: 'user', content: user },

@@ -6,6 +6,7 @@ import { uploadImageToStorage } from './supabase-blog';
 import { AUTOBLOG_PROFILE } from '@/lib/autoblog-profile';
 
 const CLIENT = () => new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+const OPENROUTER_IMAGE_MODEL = 'google/gemini-2.5-flash-image';
 
 /** PNG 1536x1024 do gpt-image-1 → 1280x853 webp q80 (~150-250KB; Neil: "5MB → 200KB"). */
 async function optimizeToWebp(buffer: Buffer): Promise<Buffer> {
@@ -15,13 +16,33 @@ async function optimizeToWebp(buffer: Buffer): Promise<Buffer> {
     .toBuffer();
 }
 
-async function generateImageB64(prompt: string): Promise<string | null> {
+async function generateImageB64(prompt: string, size: '1536x1024' | '1024x1024' = '1536x1024'): Promise<string | null> {
+  const openRouterKey = process.env.MY_BLOG_OPENROUTER_API_KEY;
+  if (openRouterKey) {
+    const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${openRouterKey}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: OPENROUTER_IMAGE_MODEL,
+        modalities: ['image', 'text'],
+        messages: [{ role: 'user', content: `${prompt}. Aspect ratio: ${size === '1024x1024' ? '1:1' : '3:2'}.` }],
+      }),
+      signal: AbortSignal.timeout(90_000),
+    });
+    if (!response.ok) throw new Error(`OpenRouter image HTTP ${response.status}`);
+    const data = (await response.json()) as {
+      choices?: Array<{ message?: { images?: Array<{ image_url?: { url?: string } }> } }>;
+    };
+    const dataUri = data.choices?.[0]?.message?.images?.[0]?.image_url?.url;
+    return dataUri?.startsWith('data:') ? dataUri.slice(dataUri.indexOf(',') + 1) : null;
+  }
+
   // gpt-image-1: sempre retorna b64_json (response_format não é aceito),
   // quality aceita 'low'|'medium'|'high'|'auto', size aceita 1024x1024|1536x1024|1024x1536|auto
   const response = (await CLIENT().images.generate({
     model: 'gpt-image-1',
     prompt,
-    size: '1536x1024',
+    size,
     quality: 'medium',
   } as Parameters<OpenAI['images']['generate']>[0])) as ImagesResponse;
   return response.data?.[0]?.b64_json ?? null;
@@ -56,13 +77,10 @@ export async function generateAndUploadInfographic(
   if (!prompt?.trim()) return null; // prompt vazio = chamada paga desperdiçada
 
   try {
-    const response = (await CLIENT().images.generate({
-      model: 'gpt-image-1',
-      prompt: `${prompt}, clean infographic style, bold shapes and icons, flat design, NO text, no words, no letters`,
-      size: '1024x1024',
-      quality: 'medium',
-    } as Parameters<OpenAI['images']['generate']>[0])) as ImagesResponse;
-    const b64 = response.data?.[0]?.b64_json;
+    const b64 = await generateImageB64(
+      `${prompt}, clean infographic style, bold shapes and icons, flat design, NO text, no words, no letters`,
+      '1024x1024',
+    );
     if (!b64) return null;
 
     const webp = await sharp(Buffer.from(b64, 'base64'))

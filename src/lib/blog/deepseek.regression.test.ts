@@ -22,6 +22,7 @@ import {
   generateArticleOutline,
   regenerateWithFeedback,
   generateArticleFromOutline,
+  blogTextProvider,
   type ArticleOutline,
 } from './deepseek';
 
@@ -52,6 +53,20 @@ const invalidParamsError = Object.assign(new Error('Invalid parameters'), { name
 
 afterEach(() => {
   mockCreate.mockReset();
+  vi.unstubAllEnvs();
+});
+
+describe('roteamento OpenRouter do autoblog', () => {
+  it('usa a chave dedicada e prefixa o modelo quando configurada', () => {
+    vi.stubEnv('MY_BLOG_OPENROUTER_API_KEY', 'or-test');
+    vi.stubEnv('DEEPSEEK_API_KEY', 'deepseek-test');
+
+    expect(blogTextProvider('deepseek-v4-flash')).toEqual({
+      apiKey: 'or-test',
+      baseURL: 'https://openrouter.ai/api/v1',
+      model: 'deepseek/deepseek-v4-flash',
+    });
+  });
 });
 
 describe('REGRESSÃO: timeout de askDeepseek não pode pular a retentativa existente', () => {

@@ -7,7 +7,7 @@
 // JSON malformado, o gate vira no-op (skipped) e o pipeline publica como hoje.
 import OpenAI from 'openai';
 import { AUTOBLOG_PROFILE } from '@/lib/autoblog-profile';
-import type { ArticleContent } from './deepseek';
+import { blogTextProvider, type ArticleContent } from './deepseek';
 
 const MODEL = 'deepseek-v4-pro';
 
@@ -202,20 +202,20 @@ function parseJudgeResponse(text: string): JudgeResult | null {
  * loga um warn — nunca lança, nunca bloqueia o pipeline de publicação.
  */
 export async function runQualityGate(article: ArticleContent): Promise<QualityGateResult> {
-  const apiKey = process.env.DEEPSEEK_API_KEY;
-  if (!apiKey) {
-    console.warn('[quality-gate] DEEPSEEK_API_KEY não configurada — gate pulado (fail-open).');
+  const provider = blogTextProvider(MODEL);
+  if (!provider.apiKey) {
+    console.warn('[quality-gate] MY_BLOG_OPENROUTER_API_KEY/DEEPSEEK_API_KEY não configurada — gate pulado (fail-open).');
     return SKIPPED_RESULT;
   }
 
   try {
     const client = new OpenAI({
-      apiKey,
-      baseURL: 'https://api.deepseek.com/v1',
+      apiKey: provider.apiKey,
+      baseURL: provider.baseURL,
       timeout: REQUEST_TIMEOUT_MS,
     });
     const response = await client.chat.completions.create({
-      model: MODEL,
+      model: provider.model,
       messages: [
         { role: 'system', content: JUDGE_SYSTEM_PROMPT },
         { role: 'user', content: buildJudgeUserMessage(article) },
