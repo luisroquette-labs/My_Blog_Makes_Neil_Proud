@@ -3,7 +3,7 @@ import sharp from 'sharp';
 import { uploadImageToStorage } from './supabase-blog';
 import { AUTOBLOG_PROFILE } from '@/lib/autoblog-profile';
 
-const OPENROUTER_IMAGE_MODEL = 'google/gemini-2.5-flash-image';
+const OPENROUTER_IMAGE_MODEL = 'openai/gpt-image-1';
 
 /** PNG 1536x1024 do gpt-image-1 → 1280x853 webp q80 (~150-250KB; Neil: "5MB → 200KB"). */
 async function optimizeToWebp(buffer: Buffer): Promise<Buffer> {
@@ -16,22 +16,21 @@ async function optimizeToWebp(buffer: Buffer): Promise<Buffer> {
 async function generateImageB64(prompt: string, size: '1536x1024' | '1024x1024' = '1536x1024'): Promise<string | null> {
   const openRouterKey = process.env.MY_BLOG_OPENROUTER_API_KEY;
   if (openRouterKey) {
-    const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+    const response = await fetch('https://openrouter.ai/api/v1/images', {
       method: 'POST',
       headers: { Authorization: `Bearer ${openRouterKey}`, 'Content-Type': 'application/json' },
       body: JSON.stringify({
         model: OPENROUTER_IMAGE_MODEL,
-        modalities: ['image', 'text'],
-        messages: [{ role: 'user', content: `${prompt}. Aspect ratio: ${size === '1024x1024' ? '1:1' : '3:2'}.` }],
+        prompt,
+        n: 1,
+        size,
+        quality: 'medium',
       }),
       signal: AbortSignal.timeout(90_000),
     });
     if (!response.ok) throw new Error(`OpenRouter image HTTP ${response.status}`);
-    const data = (await response.json()) as {
-      choices?: Array<{ message?: { images?: Array<{ image_url?: { url?: string } }> } }>;
-    };
-    const dataUri = data.choices?.[0]?.message?.images?.[0]?.image_url?.url;
-    return dataUri?.startsWith('data:') ? dataUri.slice(dataUri.indexOf(',') + 1) : null;
+    const data = (await response.json()) as { data?: Array<{ b64_json?: string }> };
+    return data.data?.[0]?.b64_json ?? null;
   }
 
   return null;
