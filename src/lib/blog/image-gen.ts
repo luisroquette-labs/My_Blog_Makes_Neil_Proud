@@ -1,11 +1,8 @@
 // src/lib/blog/image-gen.ts
-import OpenAI from 'openai';
-import type { ImagesResponse } from 'openai/resources/images';
 import sharp from 'sharp';
 import { uploadImageToStorage } from './supabase-blog';
 import { AUTOBLOG_PROFILE } from '@/lib/autoblog-profile';
 
-const CLIENT = () => new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 const OPENROUTER_IMAGE_MODEL = 'google/gemini-2.5-flash-image';
 
 /** PNG 1536x1024 do gpt-image-1 → 1280x853 webp q80 (~150-250KB; Neil: "5MB → 200KB"). */
@@ -37,15 +34,7 @@ async function generateImageB64(prompt: string, size: '1536x1024' | '1024x1024' 
     return dataUri?.startsWith('data:') ? dataUri.slice(dataUri.indexOf(',') + 1) : null;
   }
 
-  // gpt-image-1: sempre retorna b64_json (response_format não é aceito),
-  // quality aceita 'low'|'medium'|'high'|'auto', size aceita 1024x1024|1536x1024|1024x1536|auto
-  const response = (await CLIENT().images.generate({
-    model: 'gpt-image-1',
-    prompt,
-    size,
-    quality: 'medium',
-  } as Parameters<OpenAI['images']['generate']>[0])) as ImagesResponse;
-  return response.data?.[0]?.b64_json ?? null;
+  return null;
 }
 
 export async function generateAndUploadCover(

@@ -18,9 +18,7 @@ const { brand, editorial, cta } = AUTOBLOG_PROFILE;
 
 export function blogTextProvider(model: string) {
   const openRouterKey = process.env.MY_BLOG_OPENROUTER_API_KEY;
-  return openRouterKey
-    ? { apiKey: openRouterKey, baseURL: 'https://openrouter.ai/api/v1', model: `deepseek/${model}` }
-    : { apiKey: process.env.DEEPSEEK_API_KEY, baseURL: 'https://api.deepseek.com/v1', model };
+  return { apiKey: openRouterKey, baseURL: 'https://openrouter.ai/api/v1', model: `deepseek/${model}` };
 }
 
 const SYSTEM_PROMPT = `Você redige blogposts para ${brand.name} (${brand.siteUrl}),

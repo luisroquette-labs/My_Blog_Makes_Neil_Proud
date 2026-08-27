@@ -73,12 +73,12 @@ export default async function SetupPage() {
   const supabase =
     envPresent('NEXT_PUBLIC_SUPABASE_URL') && envPresent('SUPABASE_SERVICE_ROLE_KEY');
   const openrouter = envPresent('MY_BLOG_OPENROUTER_API_KEY');
-  const deepseek = openrouter || envPresent('DEEPSEEK_API_KEY');
+  const deepseek = openrouter;
   const gsc =
     envPresent('GOOGLE_CLIENT_ID') &&
     envPresent('GOOGLE_CLIENT_SECRET') &&
     envPresent('GOOGLE_REFRESH_TOKEN');
-  const images = openrouter || envPresent('OPENAI_API_KEY');
+  const images = openrouter;
   const trello =
     envPresent('TRELLO_API_KEY') && envPresent('TRELLO_TOKEN') && envPresent('TRELLO_LIST_ID');
   const telegram =
@@ -112,7 +112,7 @@ export default async function SetupPage() {
             {
               name: 'OpenRouter/DeepSeek (redação)',
               ready: deepseek,
-              action: 'Defina MY_BLOG_OPENROUTER_API_KEY ou DEEPSEEK_API_KEY.',
+              action: 'Defina MY_BLOG_OPENROUTER_API_KEY.',
             },
             {
               name: 'CRON_SECRET',
@@ -148,7 +148,7 @@ export default async function SetupPage() {
               ready: images && AUTOBLOG_PROFILE.integrations.imageGenerationEnabled,
               action: images
                 ? 'Ligue imageGenerationEnabled no perfil e crie o bucket público blog-covers no Supabase.'
-                : 'Defina MY_BLOG_OPENROUTER_API_KEY ou OPENAI_API_KEY, crie o bucket blog-covers e ligue imageGenerationEnabled.',
+                : 'Defina MY_BLOG_OPENROUTER_API_KEY, crie o bucket blog-covers e ligue imageGenerationEnabled.',
             },
           ]}
         />
