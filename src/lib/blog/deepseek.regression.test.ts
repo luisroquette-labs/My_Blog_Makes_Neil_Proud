@@ -59,8 +59,6 @@ afterEach(() => {
 describe('roteamento OpenRouter do autoblog', () => {
   it('usa a chave dedicada e prefixa o modelo quando configurada', () => {
     vi.stubEnv('MY_BLOG_OPENROUTER_API_KEY', 'or-test');
-    vi.stubEnv('DEEPSEEK_API_KEY', 'deepseek-test');
-
     expect(blogTextProvider('deepseek-v4-flash')).toEqual({
       apiKey: 'or-test',
       baseURL: 'https://openrouter.ai/api/v1',
@@ -379,7 +377,7 @@ describe('REGRESSÃO: chamadas usam um model id ativo na DeepSeek, nunca o legad
 
     await generateArticle('solução b2b');
 
-    expect(mockCreate.mock.calls[0][0].model).toBe('deepseek-v4-flash');
-    expect(mockCreate.mock.calls[0][0].model).not.toBe('deepseek-chat');
+    expect(mockCreate.mock.calls[0][0].model).toBe('deepseek/deepseek-v4-flash');
+    expect(mockCreate.mock.calls[0][0].model).not.toBe('deepseek/deepseek-chat');
   });
 });

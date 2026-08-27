@@ -204,7 +204,7 @@ function parseJudgeResponse(text: string): JudgeResult | null {
 export async function runQualityGate(article: ArticleContent): Promise<QualityGateResult> {
   const provider = blogTextProvider(MODEL);
   if (!provider.apiKey) {
-    console.warn('[quality-gate] MY_BLOG_OPENROUTER_API_KEY/DEEPSEEK_API_KEY não configurada — gate pulado (fail-open).');
+    console.warn('[quality-gate] MY_BLOG_OPENROUTER_API_KEY não configurada — gate pulado (fail-open).');
     return SKIPPED_RESULT;
   }
 
