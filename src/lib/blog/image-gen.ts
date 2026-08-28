@@ -3,9 +3,9 @@ import sharp from 'sharp';
 import { uploadImageToStorage } from './supabase-blog';
 import { AUTOBLOG_PROFILE } from '@/lib/autoblog-profile';
 
-const OPENROUTER_IMAGE_MODEL = 'openai/gpt-image-1';
+const OPENROUTER_IMAGE_MODEL = 'bytedance-seed/seedream-4.5';
 
-/** PNG 1536x1024 do gpt-image-1 → 1280x853 webp q80 (~150-250KB; Neil: "5MB → 200KB"). */
+/** Imagem 2K do Seedream 4.5 → 1280x853 webp q80 (~150-250KB; Neil: "5MB → 200KB"). */
 async function optimizeToWebp(buffer: Buffer): Promise<Buffer> {
   return sharp(buffer)
     .resize(1280, 853, { fit: 'cover' })
@@ -23,9 +23,9 @@ async function generateImageB64(prompt: string, size: '1536x1024' | '1024x1024' 
       body: JSON.stringify({
         model: OPENROUTER_IMAGE_MODEL,
         prompt,
+        resolution: '2K',
+        aspect_ratio: size === '1024x1024' ? '1:1' : '16:9',
         n: 1,
-        size,
-        quality: 'medium',
       }),
       signal: AbortSignal.timeout(90_000),
     });
