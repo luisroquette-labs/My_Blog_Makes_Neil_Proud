@@ -9,7 +9,7 @@ import OpenAI from 'openai';
 import { AUTOBLOG_PROFILE } from '@/lib/autoblog-profile';
 import { blogTextProvider, type ArticleContent } from './deepseek';
 
-const MODEL = 'deepseek-v4-pro';
+const MODEL = 'z-ai/glm-5.3-flash';
 
 export interface JudgeIssue {
   severity: 'P0' | 'P1' | 'P2';
