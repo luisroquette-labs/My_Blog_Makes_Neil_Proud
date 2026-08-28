@@ -59,10 +59,10 @@ afterEach(() => {
 describe('roteamento OpenRouter do autoblog', () => {
   it('usa a chave dedicada e prefixa o modelo quando configurada', () => {
     vi.stubEnv('MY_BLOG_OPENROUTER_API_KEY', 'or-test');
-    expect(blogTextProvider('deepseek-v4-flash')).toEqual({
+    expect(blogTextProvider('deepseek/deepseek-v4-flash-0731')).toEqual({
       apiKey: 'or-test',
       baseURL: 'https://openrouter.ai/api/v1',
-      model: 'deepseek/deepseek-v4-flash',
+      model: 'deepseek/deepseek-v4-flash-0731',
     });
   });
 });
@@ -372,12 +372,12 @@ describe('REGRESSÃO: parseOutline aceitava title de tipo errado (truthy check e
 });
 
 describe('REGRESSÃO: chamadas usam um model id ativo na DeepSeek, nunca o legado desativado', () => {
-  it('generateArticle usa deepseek-v4-flash, não o deepseek-chat desativado em 2026-07-24', async () => {
+  it('generateArticle usa o snapshot otimizado do DeepSeek', async () => {
     mockCreate.mockResolvedValueOnce(apiResponse(validArticleJson));
 
     await generateArticle('solução b2b');
 
-    expect(mockCreate.mock.calls[0][0].model).toBe('deepseek/deepseek-v4-flash');
+    expect(mockCreate.mock.calls[0][0].model).toBe('deepseek/deepseek-v4-flash-0731');
     expect(mockCreate.mock.calls[0][0].model).not.toBe('deepseek/deepseek-chat');
   });
 });

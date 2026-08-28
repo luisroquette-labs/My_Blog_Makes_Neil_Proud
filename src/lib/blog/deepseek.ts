@@ -18,7 +18,7 @@ const { brand, editorial, cta } = AUTOBLOG_PROFILE;
 
 export function blogTextProvider(model: string) {
   const openRouterKey = process.env.MY_BLOG_OPENROUTER_API_KEY;
-  return { apiKey: openRouterKey, baseURL: 'https://openrouter.ai/api/v1', model: `deepseek/${model}` };
+  return { apiKey: openRouterKey, baseURL: 'https://openrouter.ai/api/v1', model: model.includes('/') ? model : `deepseek/${model}` };
 }
 
 const SYSTEM_PROMPT = `Você redige blogposts para ${brand.name} (${brand.siteUrl}),
@@ -285,7 +285,7 @@ export function isValidOutline(outline: ArticleOutline, keyword: string): boolea
 }
 
 async function askDeepseek(system: string, user: string): Promise<string> {
-  const provider = blogTextProvider('deepseek-v4-flash');
+  const provider = blogTextProvider('deepseek/deepseek-v4-flash-0731');
   const client = new OpenAI({
     apiKey: provider.apiKey,
     baseURL: provider.baseURL,
