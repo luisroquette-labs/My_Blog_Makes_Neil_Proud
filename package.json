@@ -9,7 +9,9 @@
     "start": "next start",
     "lint": "eslint",
     "test": "vitest run",
-    "audit:runtime": "npm audit --omit=dev"
+    "audit:runtime": "npm audit --omit=dev",
+    "test:preflight-parity": "bash scripts/test-preflight-parity.sh",
+    "preflight": "bash scripts/preflight.sh"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.105.3",
