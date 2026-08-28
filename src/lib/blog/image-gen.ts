@@ -14,8 +14,7 @@ async function optimizeToWebp(buffer: Buffer): Promise<Buffer> {
 }
 
 async function generateImageB64(prompt: string, size: '1536x1024' | '1024x1024' = '1536x1024'): Promise<string | null> {
-  const openRouterKey = process.env.MY_BLOG_IMAGES_OPENROUTER_API_KEY
-    || process.env.MY_BLOG_OPENROUTER_API_KEY;
+  const openRouterKey = process.env.MY_BLOG_IMAGES_OPENROUTER_API_KEY;
   if (openRouterKey) {
     const response = await fetch('https://openrouter.ai/api/v1/images', {
       method: 'POST',
