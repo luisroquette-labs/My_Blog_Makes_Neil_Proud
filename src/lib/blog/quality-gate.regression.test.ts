@@ -49,7 +49,7 @@ afterEach(() => {
 
 describe('REGRESSÃO: quality-gate — parse e fail-open', () => {
   it('parseia um score válido retornado pelo judge', async () => {
-    vi.stubEnv('DEEPSEEK_API_KEY', 'sk-deepseek-teste');
+    vi.stubEnv('MY_BLOG_OPENROUTER_API_KEY', 'sk-openrouter-teste');
     mockCreate.mockResolvedValueOnce(judgeApiResponse(validJudgeJson(85)));
 
     const result = await runQualityGate(makeArticle());
@@ -61,7 +61,7 @@ describe('REGRESSÃO: quality-gate — parse e fail-open', () => {
   });
 
   it('fail-open: sem DEEPSEEK_API_KEY, pula o gate sem chamar a API', async () => {
-    vi.stubEnv('DEEPSEEK_API_KEY', '');
+    vi.stubEnv('MY_BLOG_OPENROUTER_API_KEY', '');
 
     const result = await runQualityGate(makeArticle());
 
@@ -72,7 +72,7 @@ describe('REGRESSÃO: quality-gate — parse e fail-open', () => {
   });
 
   it('fail-open: JSON malformado do judge não quebra o pipeline', async () => {
-    vi.stubEnv('DEEPSEEK_API_KEY', 'sk-deepseek-teste');
+    vi.stubEnv('MY_BLOG_OPENROUTER_API_KEY', 'sk-openrouter-teste');
     mockCreate.mockResolvedValueOnce({ choices: [{ message: { content: 'não é json {{{' } }] });
 
     const result = await runQualityGate(makeArticle());
@@ -82,7 +82,7 @@ describe('REGRESSÃO: quality-gate — parse e fail-open', () => {
   });
 
   it('fail-open: JSON válido mas fora do schema esperado (falta categories)', async () => {
-    vi.stubEnv('DEEPSEEK_API_KEY', 'sk-deepseek-teste');
+    vi.stubEnv('MY_BLOG_OPENROUTER_API_KEY', 'sk-openrouter-teste');
     mockCreate.mockResolvedValueOnce(judgeApiResponse({ total_score: 90, issues: [] }));
 
     const result = await runQualityGate(makeArticle());
@@ -91,7 +91,7 @@ describe('REGRESSÃO: quality-gate — parse e fail-open', () => {
   });
 
   it('fail-open: a chamada à API lançando exceção não propaga erro', async () => {
-    vi.stubEnv('DEEPSEEK_API_KEY', 'sk-deepseek-teste');
+    vi.stubEnv('MY_BLOG_OPENROUTER_API_KEY', 'sk-openrouter-teste');
     mockCreate.mockRejectedValueOnce(new Error('network down'));
 
     const result = await runQualityGate(makeArticle());
@@ -101,7 +101,7 @@ describe('REGRESSÃO: quality-gate — parse e fail-open', () => {
   });
 
   it('fail-open: total_score acima de 100 (judge hallucinou) é rejeitado', async () => {
-    vi.stubEnv('DEEPSEEK_API_KEY', 'sk-deepseek-teste');
+    vi.stubEnv('MY_BLOG_OPENROUTER_API_KEY', 'sk-openrouter-teste');
     mockCreate.mockResolvedValueOnce(judgeApiResponse(validJudgeJson(150)));
 
     const result = await runQualityGate(makeArticle());
@@ -111,7 +111,7 @@ describe('REGRESSÃO: quality-gate — parse e fail-open', () => {
   });
 
   it('fail-open: total_score negativo é rejeitado', async () => {
-    vi.stubEnv('DEEPSEEK_API_KEY', 'sk-deepseek-teste');
+    vi.stubEnv('MY_BLOG_OPENROUTER_API_KEY', 'sk-openrouter-teste');
     mockCreate.mockResolvedValueOnce(judgeApiResponse(validJudgeJson(-10)));
 
     const result = await runQualityGate(makeArticle());
@@ -121,7 +121,7 @@ describe('REGRESSÃO: quality-gate — parse e fail-open', () => {
   });
 
   it('fail-open: categoria acima do máximo do rubric (ex: content_quality > 30) é rejeitada', async () => {
-    vi.stubEnv('DEEPSEEK_API_KEY', 'sk-deepseek-teste');
+    vi.stubEnv('MY_BLOG_OPENROUTER_API_KEY', 'sk-openrouter-teste');
     mockCreate.mockResolvedValueOnce(judgeApiResponse({
       total_score: 85,
       categories: { content_quality: 99, seo: 15, eeat: 10, technical: 10, geo: 10 },
@@ -134,7 +134,7 @@ describe('REGRESSÃO: quality-gate — parse e fail-open', () => {
   });
 
   it('sanitiza issues: descarta issue sem fix_instruction em vez de repassar "undefined" adiante', async () => {
-    vi.stubEnv('DEEPSEEK_API_KEY', 'sk-deepseek-teste');
+    vi.stubEnv('MY_BLOG_OPENROUTER_API_KEY', 'sk-openrouter-teste');
     mockCreate.mockResolvedValueOnce(judgeApiResponse(validJudgeJson(60, [
       // issue malformada do judge: sem fix_instruction
       { severity: 'P0', category: 'seo', section: 'title', problem: 'genérico' } as unknown as JudgeIssue,
@@ -149,7 +149,7 @@ describe('REGRESSÃO: quality-gate — parse e fail-open', () => {
   });
 
   it('sanitiza issues: severity inválida do judge cai para P2 em vez de vazar valor arbitrário', async () => {
-    vi.stubEnv('DEEPSEEK_API_KEY', 'sk-deepseek-teste');
+    vi.stubEnv('MY_BLOG_OPENROUTER_API_KEY', 'sk-openrouter-teste');
     mockCreate.mockResolvedValueOnce(judgeApiResponse(validJudgeJson(60, [
       { severity: 'critical' as unknown as JudgeIssue['severity'], category: 'seo', section: 'title', problem: 'x', fix_instruction: 'corrigir' },
     ])));
@@ -161,7 +161,7 @@ describe('REGRESSÃO: quality-gate — parse e fail-open', () => {
   });
 
   it('limita a lista de issues a 30, mesmo se o judge devolver mais', async () => {
-    vi.stubEnv('DEEPSEEK_API_KEY', 'sk-deepseek-teste');
+    vi.stubEnv('MY_BLOG_OPENROUTER_API_KEY', 'sk-openrouter-teste');
     const manyIssues = Array.from({ length: 50 }, (_, i) => ({
       severity: 'P2' as const,
       category: 'seo',
@@ -178,7 +178,7 @@ describe('REGRESSÃO: quality-gate — parse e fail-open', () => {
   });
 
   it('configura timeout e max_tokens na chamada ao judge (sem timeout, uma chamada travada trava o pipeline)', async () => {
-    vi.stubEnv('DEEPSEEK_API_KEY', 'sk-deepseek-teste');
+    vi.stubEnv('MY_BLOG_OPENROUTER_API_KEY', 'sk-openrouter-teste');
     mockCreate.mockResolvedValueOnce(judgeApiResponse(validJudgeJson(90)));
 
     await runQualityGate(makeArticle());
@@ -201,7 +201,7 @@ describe('REGRESSÃO: quality-gate — loop de regeneração (mesma condição d
   }
 
   it('para no primeiro score >= 90, sem regenerar', async () => {
-    vi.stubEnv('DEEPSEEK_API_KEY', 'sk-deepseek-teste');
+    vi.stubEnv('MY_BLOG_OPENROUTER_API_KEY', 'sk-openrouter-teste');
     mockCreate.mockResolvedValueOnce(judgeApiResponse(validJudgeJson(95)));
 
     const { judged, attempt } = await runLoop(makeArticle());
@@ -212,7 +212,7 @@ describe('REGRESSÃO: quality-gate — loop de regeneração (mesma condição d
   });
 
   it('para após 2 tentativas mesmo se o score continuar abaixo de 90', async () => {
-    vi.stubEnv('DEEPSEEK_API_KEY', 'sk-deepseek-teste');
+    vi.stubEnv('MY_BLOG_OPENROUTER_API_KEY', 'sk-openrouter-teste');
     mockCreate
       .mockResolvedValueOnce(judgeApiResponse(validJudgeJson(60, [
         { severity: 'P0', category: 'content_quality', section: 'lead', problem: 'clichê', fix_instruction: 'remover clichê' },
@@ -228,7 +228,7 @@ describe('REGRESSÃO: quality-gate — loop de regeneração (mesma condição d
   });
 
   it('caso positivo: score alto na primeira tentativa publica sem regenerar e sem perder issues vazias', async () => {
-    vi.stubEnv('DEEPSEEK_API_KEY', 'sk-deepseek-teste');
+    vi.stubEnv('MY_BLOG_OPENROUTER_API_KEY', 'sk-openrouter-teste');
     mockCreate.mockResolvedValueOnce(judgeApiResponse(validJudgeJson(100)));
 
     const { judged, attempt } = await runLoop(makeArticle());

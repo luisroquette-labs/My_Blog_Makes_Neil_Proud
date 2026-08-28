@@ -9,7 +9,7 @@ import OpenAI from 'openai';
 import { AUTOBLOG_PROFILE } from '@/lib/autoblog-profile';
 import type { ArticleContent } from './deepseek';
 
-const MODEL = 'deepseek-v4-pro';
+const MODEL = 'deepseek/deepseek-v4-pro';
 
 export interface JudgeIssue {
   severity: 'P0' | 'P1' | 'P2';
@@ -197,21 +197,21 @@ function parseJudgeResponse(text: string): JudgeResult | null {
 }
 
 /**
- * Roda o LLM-judge sobre o artigo final. Fail-open: sem DEEPSEEK_API_KEY, ou
+ * Roda o LLM-judge sobre o artigo final. Fail-open: sem MY_BLOG_OPENROUTER_API_KEY, ou
  * se a chamada/parse falhar por qualquer motivo, retorna { skipped: true } e
  * loga um warn — nunca lança, nunca bloqueia o pipeline de publicação.
  */
 export async function runQualityGate(article: ArticleContent): Promise<QualityGateResult> {
-  const apiKey = process.env.DEEPSEEK_API_KEY;
+  const apiKey = process.env.MY_BLOG_OPENROUTER_API_KEY;
   if (!apiKey) {
-    console.warn('[quality-gate] DEEPSEEK_API_KEY não configurada — gate pulado (fail-open).');
+    console.warn('[quality-gate] MY_BLOG_OPENROUTER_API_KEY não configurada — gate pulado (fail-open).');
     return SKIPPED_RESULT;
   }
 
   try {
     const client = new OpenAI({
       apiKey,
-      baseURL: 'https://api.deepseek.com/v1',
+      baseURL: 'https://openrouter.ai/api/v1',
       timeout: REQUEST_TIMEOUT_MS,
     });
     const response = await client.chat.completions.create({

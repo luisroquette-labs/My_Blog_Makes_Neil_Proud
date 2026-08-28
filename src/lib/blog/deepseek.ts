@@ -281,8 +281,8 @@ export function isValidOutline(outline: ArticleOutline, keyword: string): boolea
 
 async function askDeepseek(system: string, user: string): Promise<string> {
   const client = new OpenAI({
-    apiKey: process.env.DEEPSEEK_API_KEY,
-    baseURL: 'https://api.deepseek.com/v1',
+    apiKey: process.env.MY_BLOG_OPENROUTER_API_KEY,
+    baseURL: 'https://openrouter.ai/api/v1',
     // Sem timeout, uma chamada travada trava o pipeline inteiro até o
     // maxDuration da function (regenerateWithFeedback é chamado em loop
     // pelo quality-gate, até 2x por publicação).
@@ -291,7 +291,7 @@ async function askDeepseek(system: string, user: string): Promise<string> {
   const response = await client.chat.completions.create({
     // 'deepseek-chat' foi desativado pela DeepSeek em 2026-07-24 — deepseek-v4-flash
     // é o substituto de custo equivalente (não-thinking), não deepseek-v4-pro (3x).
-    model: 'deepseek-v4-flash',
+    model: 'deepseek/deepseek-v4-flash',
     messages: [
       { role: 'system', content: system },
       { role: 'user', content: user },

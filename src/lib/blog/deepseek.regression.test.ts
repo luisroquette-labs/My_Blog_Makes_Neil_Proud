@@ -364,7 +364,7 @@ describe('REGRESSÃO: chamadas usam um model id ativo na DeepSeek, nunca o legad
 
     await generateArticle('solução b2b');
 
-    expect(mockCreate.mock.calls[0][0].model).toBe('deepseek-v4-flash');
+    expect(mockCreate.mock.calls[0][0].model).toBe('deepseek/deepseek-v4-flash');
     expect(mockCreate.mock.calls[0][0].model).not.toBe('deepseek-chat');
   });
 });
