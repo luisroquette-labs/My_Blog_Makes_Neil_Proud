@@ -78,7 +78,7 @@ export default async function SetupPage() {
     envPresent('GOOGLE_CLIENT_ID') &&
     envPresent('GOOGLE_CLIENT_SECRET') &&
     envPresent('GOOGLE_REFRESH_TOKEN');
-  const images = envPresent('MY_BLOG_IMAGES_OPENROUTER_API_KEY') || openrouter;
+  const images = envPresent('MY_BLOG_IMAGES_OPENROUTER_API_KEY');
   const trello =
     envPresent('TRELLO_API_KEY') && envPresent('TRELLO_TOKEN') && envPresent('TRELLO_LIST_ID');
   const telegram =
