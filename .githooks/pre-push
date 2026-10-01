@@ -8,4 +8,4 @@ while read -r _local_ref _local_sha remote_ref _remote_sha; do
   fi
 done
 
-npm run preflight
+npm run preflight:ci
