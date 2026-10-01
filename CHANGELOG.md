@@ -90,7 +90,7 @@ Station) está implementado e validado — das fundações de SEO à autoridade.
 - Deploy de produção realizado com `vercel build --prod` +
   `vercel deploy --prebuilt` (0 build minutes).
 
-[1.0.0]: https://github.com/luisroquette/My_Blog_Makes_Neil_Proud/compare/v0.2.0...v1.0.0
+[1.0.0]: https://github.com/luisroquette-labs/My_Blog_Makes_Neil_Proud/compare/v0.2.0...v1.0.0
 
 ## [0.2.0] - 2026-08-08
 
@@ -116,7 +116,7 @@ Station) está implementado e validado — das fundações de SEO à autoridade.
 - ESLint, build de produção e auditoria de dependências de runtime sem
   vulnerabilidades.
 
-[0.2.0]: https://github.com/luisroquette/My_Blog_Makes_Neil_Proud/releases/tag/v0.2.0
+[0.2.0]: https://github.com/luisroquette-labs/My_Blog_Makes_Neil_Proud/releases/tag/v0.2.0
 
 ## [0.1.0] - 2026-07-24
 
@@ -145,4 +145,4 @@ Station) está implementado e validado — das fundações de SEO à autoridade.
 - ESLint e build de produção.
 - Auditoria de dependências de runtime sem vulnerabilidades altas ou críticas.
 
-[0.1.0]: https://github.com/luisroquette/My_Blog_Makes_Neil_Proud/releases/tag/v0.1.0
+[0.1.0]: https://github.com/luisroquette-labs/My_Blog_Makes_Neil_Proud/releases/tag/v0.1.0
