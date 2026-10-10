@@ -28,8 +28,10 @@
     "sharp": "^0.35.4"
   },
   "overrides": {
+    "braces": "https://github.com/luisroquette-labs/braces/archive/675def268ad3a16e0fc268224f101dc82f347df7.tar.gz",
     "gaxios": "7.3.0",
-    "postcss": "^8.5.18"
+    "postcss": "^8.5.18",
+    "postcss-selector-parser": "7.1.6"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4.3.3",
