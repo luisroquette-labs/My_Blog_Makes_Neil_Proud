@@ -212,6 +212,7 @@ export async function runQualityGate(article: ArticleContent): Promise<QualityGa
     const client = new OpenAI({
       apiKey: provider.apiKey,
       baseURL: provider.baseURL,
+      fetch: provider.fetch,
       timeout: REQUEST_TIMEOUT_MS,
     });
     const response = await client.chat.completions.create({

@@ -59,7 +59,7 @@ afterEach(() => {
 describe('roteamento OpenRouter do autoblog', () => {
   it('usa a chave dedicada e prefixa o modelo quando configurada', () => {
     vi.stubEnv('MY_BLOG_OPENROUTER_API_KEY', 'or-test');
-    expect(blogTextProvider('deepseek/deepseek-v4-flash-0731')).toEqual({
+    expect(blogTextProvider('deepseek/deepseek-v4-flash-0731')).toMatchObject({
       apiKey: 'or-test',
       baseURL: 'https://openrouter.ai/api/v1',
       model: 'deepseek/deepseek-v4-flash-0731',
