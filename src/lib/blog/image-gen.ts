@@ -3,9 +3,14 @@ import sharp from 'sharp';
 import { uploadImageToStorage } from './supabase-blog';
 import { AUTOBLOG_PROFILE } from '@/lib/autoblog-profile';
 
-const OPENROUTER_IMAGE_MODEL = 'bytedance-seed/seedream-4.5';
+const IMAGE_MODELS = {
+  premium: 'bytedance-seed/seedream-5-0-pro',
+  standard: 'bytedance-seed/seedream-4.5',
+  fast: 'google/gemini-3.1-flash-lite-image',
+} as const;
+type ImageTier = keyof typeof IMAGE_MODELS;
 
-/** Imagem 2K do Seedream 4.5 → 1280x853 webp q80 (~150-250KB; Neil: "5MB → 200KB"). */
+/** Imagem de capa 2K → 1280x853 webp q80 (~150-250KB; Neil: "5MB → 200KB"). */
 async function optimizeToWebp(buffer: Buffer): Promise<Buffer> {
   return sharp(buffer)
     .resize(1280, 853, { fit: 'cover' })
@@ -13,16 +18,16 @@ async function optimizeToWebp(buffer: Buffer): Promise<Buffer> {
     .toBuffer();
 }
 
-async function generateImageB64(prompt: string, size: '1536x1024' | '1024x1024' = '1536x1024'): Promise<string | null> {
+async function generateImageB64(prompt: string, tier: ImageTier, size: '1536x1024' | '1024x1024' = '1536x1024'): Promise<string | null> {
   const openRouterKey = process.env.MY_BLOG_IMAGES_OPENROUTER_API_KEY;
   if (openRouterKey) {
     const response = await fetch('https://openrouter.ai/api/v1/images', {
       method: 'POST',
       headers: { Authorization: `Bearer ${openRouterKey}`, 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        model: OPENROUTER_IMAGE_MODEL,
+        model: IMAGE_MODELS[tier],
         prompt,
-        resolution: '2K',
+        resolution: tier === 'fast' ? '1K' : '2K',
         aspect_ratio: size === '1024x1024' ? '1:1' : '16:9',
         n: 1,
       }),
@@ -44,7 +49,7 @@ export async function generateAndUploadCover(
   if (!prompt?.trim()) return null; // prompt vazio = chamada paga desperdiçada
 
   try {
-    const b64 = await generateImageB64(prompt);
+    const b64 = await generateImageB64(prompt, 'premium');
     if (!b64) return null;
 
     const webp = await optimizeToWebp(Buffer.from(b64, 'base64'));
@@ -67,6 +72,7 @@ export async function generateAndUploadInfographic(
   try {
     const b64 = await generateImageB64(
       `${prompt}, clean infographic style, bold shapes and icons, flat design, NO text, no words, no letters`,
+      'standard',
       '1024x1024',
     );
     if (!b64) return null;
@@ -94,7 +100,7 @@ export async function generateAndUploadBodyImages(
   for (let i = 0; i < prompts.length; i++) {
     if (!prompts[i]?.trim()) continue; // prompt vazio = chamada paga desperdiçada
     try {
-      const b64 = await generateImageB64(prompts[i]);
+      const b64 = await generateImageB64(prompts[i], 'fast');
       if (!b64) continue;
       const webp = await optimizeToWebp(Buffer.from(b64, 'base64'));
       const url = await uploadImageToStorage(`${slug}-body-${i + 1}.webp`, webp, 'image/webp');
