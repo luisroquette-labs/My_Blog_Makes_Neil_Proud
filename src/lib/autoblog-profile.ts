@@ -86,7 +86,7 @@ export const AUTOBLOG_PROFILE = {
     // Mídia paga: hook reservado ("abrir a carteira"). Sem integração até o
     // dono escolher a plataforma — orçamento e canal viram config do perfil.
     paidPromotionEnabled: false,
-    // Infográfico no fim do artigo (gpt-image-1 quadrado, sem texto).
+    // Infográfico no fim do artigo (Seedream 4.5 quadrado, sem texto).
     // Custo: 1 imagem extra por artigo — ligar junto com imageGenerationEnabled.
     infographicsEnabled: false,
   },
