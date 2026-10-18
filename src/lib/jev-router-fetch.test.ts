@@ -9,6 +9,7 @@ describe('Jev Router fetch', () => {
     const fetchImpl = vi.fn().mockResolvedValueOnce(new Response('{}', { status: 503 })).mockResolvedValueOnce(new Response('{"choices":[{"message":{"content":"ok"}}]}'));
     await createJevRouterFetch(fetchImpl)('https://openrouter.ai/api/v1/chat/completions', { method: 'POST', body: JSON.stringify({ model: 'fixed', messages: [] }) });
     expect(JSON.parse(fetchImpl.mock.calls[0][1].body).model).toBe('typesafe/jev-router');
+    expect(JSON.parse(fetchImpl.mock.calls[0][1].body).plugins).toEqual([{ id: 'jev-router', cost_tier: 'low', excluded_models: ['anthropic/*', 'openai/*', 'google/*'] }]);
     expect(JSON.parse(fetchImpl.mock.calls[1][1].body).model).toBe('fixed');
   });
 });

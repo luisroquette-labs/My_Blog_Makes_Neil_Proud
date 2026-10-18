@@ -30,7 +30,7 @@ export function createJevRouterFetch(fetchImpl: typeof fetch = fetch): typeof fe
     const plugins = Array.isArray(body.plugins) ? body.plugins.filter(p => !p || typeof p !== 'object' || (p as { id?: unknown }).id !== 'jev-router') : [];
     let routed: Response;
     try {
-      routed = await fetchImpl(input, { ...init, body: JSON.stringify({ ...body, model: JEV_ROUTER_MODEL, plugins: [{ id: 'jev-router', cost_tier: tier() }, ...plugins] }) });
+      routed = await fetchImpl(input, { ...init, body: JSON.stringify({ ...body, model: JEV_ROUTER_MODEL, plugins: [{ id: 'jev-router', cost_tier: tier(), excluded_models: ['anthropic/*', 'openai/*', 'google/*'] }, ...plugins] }) });
     } catch {
       return fetchImpl(input, init);
     }
