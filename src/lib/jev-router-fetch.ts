@@ -2,7 +2,7 @@ export const JEV_ROUTER_MODEL = 'typesafe/jev-router';
 
 function percent(): number {
   const raw = process.env.OPENROUTER_JEV_PERCENT?.trim();
-  if (!raw) return 0;
+  if (!raw) return 100;
   const value = Number(raw);
   if (!Number.isFinite(value) || value < 0 || value > 100) throw new Error('OPENROUTER_JEV_PERCENT must be between 0 and 100');
   return value;
@@ -30,7 +30,7 @@ export function createJevRouterFetch(fetchImpl: typeof fetch = fetch): typeof fe
     const plugins = Array.isArray(body.plugins) ? body.plugins.filter(p => !p || typeof p !== 'object' || (p as { id?: unknown }).id !== 'jev-router') : [];
     let routed: Response;
     try {
-      routed = await fetchImpl(input, { ...init, body: JSON.stringify({ ...body, model: JEV_ROUTER_MODEL, plugins: [{ id: 'jev-router', cost_tier: tier(), excluded_models: ['anthropic/*', 'openai/*', 'google/*'] }, ...plugins] }) });
+      routed = await fetchImpl(input, { ...init, body: JSON.stringify({ ...body, model: JEV_ROUTER_MODEL, provider: { only: ['Anthropic'] }, plugins: [{ id: 'jev-router', cost_tier: tier(), allowed_models: ['anthropic/claude-haiku-5.5', 'anthropic/claude-sonnet-5.5', 'anthropic/claude-opus-5.5'] }, ...plugins] }) });
     } catch {
       return fetchImpl(input, init);
     }
