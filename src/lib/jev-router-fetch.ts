@@ -18,7 +18,7 @@ function tier(): 'low' | 'medium' | 'high' {
 async function usable(response: Response): Promise<boolean> {
   if (!response.ok) return false;
   const data = await response.clone().json().catch(() => null) as { choices?: Array<{ message?: { content?: unknown; tool_calls?: unknown[] } }> } | null;
-  if (!data) return true;
+  if (!data) return response.headers.get('content-type')?.includes('text/event-stream') ?? false;
   const message = data.choices?.[0]?.message;
   return Boolean((typeof message?.content === 'string' && message.content.trim()) || message?.tool_calls?.length);
 }
@@ -29,7 +29,16 @@ export function createJevRouterFetch(fetchImpl: typeof fetch = fetch): typeof fe
     if (!url.endsWith('/chat/completions') || typeof init?.body !== 'string' || percent() === 0 || Math.random() * 100 >= percent()) return fetchImpl(input, init);
     const body = JSON.parse(init.body) as Record<string, unknown>;
     const plugins = Array.isArray(body.plugins) ? body.plugins.filter(p => !p || typeof p !== 'object' || (p as { id?: unknown }).id !== 'jev-router') : [];
-    const fallback = () => fetchImpl(input, { ...init, body: JSON.stringify({ ...body, model: CLAUDE_FALLBACK_MODEL, provider: { ...(typeof body.provider === 'object' && body.provider ? body.provider : {}), only: ['Anthropic'] }, plugins }) });
+    const fallback = async () => {
+      try {
+        const claude = await fetchImpl(input, { ...init, body: JSON.stringify({ ...body, model: CLAUDE_FALLBACK_MODEL, provider: { ...(typeof body.provider === 'object' && body.provider ? body.provider : {}), only: ['Anthropic'] }, plugins }) });
+        if (await usable(claude)) return claude;
+        await claude.body?.cancel().catch(() => undefined);
+      } catch {
+        // Original route below preserves continuity.
+      }
+      return fetchImpl(input, init);
+    };
     let routed: Response;
     try {
       routed = await fetchImpl(input, { ...init, body: JSON.stringify({ ...body, model: JEV_ROUTER_MODEL, provider: { only: ['Anthropic'] }, plugins: [{ id: 'jev-router', cost_tier: tier(), allowed_models: ['anthropic/claude-haiku-5.5', 'anthropic/claude-sonnet-5.5', 'anthropic/claude-opus-5.5'] }, ...plugins] }) });
