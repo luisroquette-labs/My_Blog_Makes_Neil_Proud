@@ -23,7 +23,13 @@ async function generateImageB64(prompt: string, tier: ImageTier, size: '1536x102
   if (openRouterKey) {
     const response = await fetch('https://openrouter.ai/api/v1/images', {
       method: 'POST',
-      headers: { Authorization: `Bearer ${openRouterKey}`, 'Content-Type': 'application/json' },
+      // 'HTTP-Referer'/'X-Title': atribuição OpenRouter; sem Referer cai em "Unknown".
+      headers: {
+        Authorization: `Bearer ${openRouterKey}`,
+        'Content-Type': 'application/json',
+        'HTTP-Referer': 'https://my-blog.cfgauss.ai',
+        'X-Title': 'My Blog Engine',
+      },
       body: JSON.stringify({
         model: IMAGE_MODELS[tier],
         prompt,
