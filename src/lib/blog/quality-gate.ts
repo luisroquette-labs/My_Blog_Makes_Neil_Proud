@@ -213,6 +213,8 @@ export async function runQualityGate(article: ArticleContent): Promise<QualityGa
       apiKey: provider.apiKey,
       baseURL: provider.baseURL,
       fetch: provider.fetch,
+      // Atribuição OpenRouter: sem HTTP-Referer a chamada cai em "Unknown".
+      defaultHeaders: { 'HTTP-Referer': 'https://my-blog.cfgauss.ai', 'X-Title': 'My Blog Engine' },
       timeout: REQUEST_TIMEOUT_MS,
     });
     const response = await client.chat.completions.create({
