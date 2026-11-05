@@ -289,7 +289,6 @@ async function askDeepseek(system: string, user: string): Promise<string> {
   const client = new OpenAI({
     apiKey: provider.apiKey,
     baseURL: provider.baseURL,
-    fetch: provider.fetch,
     // Atribuição OpenRouter: sem HTTP-Referer a chamada cai em "Unknown".
     defaultHeaders: { 'HTTP-Referer': 'https://my-blog.cfgauss.ai', 'X-Title': 'My Blog Engine' },
     // Sem timeout, uma chamada travada trava o pipeline inteiro até o
