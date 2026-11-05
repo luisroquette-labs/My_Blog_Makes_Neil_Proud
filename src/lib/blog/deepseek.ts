@@ -2,7 +2,6 @@
 import OpenAI from 'openai';
 import { AUTOBLOG_PROFILE } from '@/lib/autoblog-profile';
 import { buildEditorialBriefSection, type EditorialBrief } from '@/lib/blog/editorial-calendar';
-import { createJevRouterFetch } from '@/lib/jev-router-fetch';
 
 export interface ArticleContent {
   title: string;
@@ -19,7 +18,7 @@ const { brand, editorial, cta } = AUTOBLOG_PROFILE;
 
 export function blogTextProvider(model: string) {
   const openRouterKey = process.env.MY_BLOG_OPENROUTER_API_KEY;
-  return { apiKey: openRouterKey, baseURL: 'https://openrouter.ai/api/v1', model: model.includes('/') ? model : `deepseek/${model}`, fetch: createJevRouterFetch() };
+  return { apiKey: openRouterKey, baseURL: 'https://openrouter.ai/api/v1', model: model.includes('/') ? model : `deepseek/${model}` };
 }
 
 const SYSTEM_PROMPT = `Você redige blogposts para ${brand.name} (${brand.siteUrl}),
@@ -290,7 +289,6 @@ async function askDeepseek(system: string, user: string): Promise<string> {
   const client = new OpenAI({
     apiKey: provider.apiKey,
     baseURL: provider.baseURL,
-    fetch: provider.fetch,
     // Atribuição OpenRouter: sem HTTP-Referer a chamada cai em "Unknown".
     defaultHeaders: { 'HTTP-Referer': 'https://my-blog.cfgauss.ai', 'X-Title': 'My Blog Engine' },
     // Sem timeout, uma chamada travada trava o pipeline inteiro até o
