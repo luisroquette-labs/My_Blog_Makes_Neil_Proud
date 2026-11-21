@@ -1,8 +1,3 @@
-// src/lib/blog/image-body.ts
-// Injeção de imagens no corpo: quebra blocos de texto (guias Neil/RD recomendam
-// 1-2 imagens além da capa). Insere antes do 2º e do 4º H2 — pontos de respiro
-// naturais do artigo.
-
 export interface BodyImage {
   url: string;
   alt: string;
@@ -22,7 +17,6 @@ export function injectBodyImages(content: string, images: BodyImage[]): string {
     ? [h2Indexes[1], h2Indexes[3]]
     : [h2Indexes[1]];
 
-  // Insere de trás para frente para não deslocar os índices seguintes
   targets
     .map((lineIndex, i) => ({ lineIndex, image: images[i] }))
     .filter(x => x.image !== undefined)
@@ -34,8 +28,6 @@ export function injectBodyImages(content: string, images: BodyImage[]): string {
   return lines.join('\n');
 }
 
-/** Insere o infográfico antes do ÚLTIMO H2 (resumo visual antes do fechamento).
- *  Sem H2 no conteúdo, insere no fim. Null = conteúdo intacto. */
 export function injectInfographic(content: string, infographic: BodyImage | null): string {
   if (!infographic) return content;
 
@@ -56,8 +48,6 @@ export interface InlineCta {
   url: string;
 }
 
-/** Insere UM CTA (blockquote com link) logo após CADA imagem do corpo.
- *  Sem CTA configurado (url vazia) ou sem imagens → conteúdo intacto. */
 export function injectInlineCtas(content: string, cta: InlineCta | null): string {
   if (!cta || !cta.url.trim()) return content;
 
@@ -67,7 +57,6 @@ export function injectInlineCtas(content: string, cta: InlineCta | null): string
     .map((line, i) => (/^!\[[^\]]*\]\([^)]*\)/.test(line) ? i : -1))
     .filter(i => i >= 0);
 
-  // De trás para frente para não deslocar os índices seguintes
   [...imageIndexes].reverse().forEach(i => {
     lines.splice(i + 1, 0, '', block);
   });

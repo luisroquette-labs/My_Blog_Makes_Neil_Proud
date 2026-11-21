@@ -1,9 +1,7 @@
-// src/lib/blog/gsc.ts
 import { google } from 'googleapis';
 import { AUTOBLOG_PROFILE } from '@/lib/autoblog-profile';
 import { getNextSeedKeyword } from './seed-keywords';
 
-// Mínimo de keywords elegíveis no GSC para não usar fallback de seeds
 const MIN_ELIGIBLE = 5;
 
 function getDayOfYear(): number {
@@ -17,7 +15,6 @@ export async function fetchTopKeyword(existingKeywords: string[]): Promise<strin
     return getNextSeedKeyword(getDayOfYear());
   }
 
-  // Flag ligada sem credenciais: falha em silêncio = debug impossível. Diagnóstico claro.
   const missing = ['GOOGLE_CLIENT_ID', 'GOOGLE_CLIENT_SECRET', 'GOOGLE_REFRESH_TOKEN'].filter(
     k => !process.env[k],
   );
@@ -45,8 +42,6 @@ export async function fetchTopKeyword(existingKeywords: string[]): Promise<strin
         endDate,
         dimensions: ['query'],
         rowLimit: 200,
-        // ATENÇÃO: position NÃO é filtrável via dimensionFilterGroups
-        // É uma métrica de row, não uma dimensão. Filtrar no código abaixo.
       },
     });
 
