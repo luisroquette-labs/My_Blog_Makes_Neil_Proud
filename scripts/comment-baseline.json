@@ -45,7 +45,7 @@
   "src/components/blog/CommentForm.tsx": 3,
   "src/components/blog/Comments.tsx": 3,
   "src/components/blog/CtaButton.tsx": 4,
-  "src/components/blog/EndCta.tsx": 9,
+  "src/components/blog/EndCta.tsx": 1,
   "src/components/blog/LeadForm.tsx": 3,
   "src/lib/autoblog-profile.ts": 23,
   "src/lib/blog/comments.regression.test.ts": 1,

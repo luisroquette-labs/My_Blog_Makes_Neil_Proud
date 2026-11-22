@@ -1,6 +1,3 @@
-// src/components/blog/EndCta.tsx
-// Fechamento do artigo: CTA primário do perfil OU fallback de compartilhamento
-// + newsletter (o fechamento sempre leva a UMA ação — guia Neil Patel).
 import { AUTOBLOG_PROFILE } from '@/lib/autoblog-profile';
 import { buildShareUrls, hasPrimaryCta, resolveCtaVariant } from '@/lib/blog/cta';
 import CtaButton from '@/components/blog/CtaButton';
@@ -17,10 +14,6 @@ export default function EndCta({ title, slug }: EndCtaProps) {
   const { cta } = AUTOBLOG_PROFILE;
   const url = `${AUTOBLOG_PROFILE.brand.siteUrl}/blog/${slug}`;
 
-  // A/B de CTA: variante determinística por slug+semana; sem variantes, o CTA
-  // padrão do perfil. A variante ativa vai para o beacon de clique.
-  // O render roda no servidor e congela no cache ISR até a revalidação —
-  // sem relógio no client, sem risco de hidratação.
   // eslint-disable-next-line react-hooks/purity
   const weekIndex = Math.floor(Date.now() / (7 * 24 * 60 * 60 * 1000));
   const variantIndex = resolveCtaVariant(slug, weekIndex, cta.variants);
@@ -42,7 +35,6 @@ export default function EndCta({ title, slug }: EndCtaProps) {
     );
   }
 
-  // Fallback: sem CTA configurado, a ação é compartilhar (+ newsletter se houver)
   const share = buildShareUrls(url, title);
   return (
     <div className="mt-12 p-6 rounded-2xl border border-primary/30 bg-primary/5">
